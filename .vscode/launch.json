@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "STM32 ST-Link: Debug OV_Watch",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/Debug/OV_Watch.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "stlink",
+      "device": "STM32F411CEUx",
+      "interface": "swd",
+      "preLaunchTask": "CMake: Build Debug",
+      "armToolchainPath": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
+      "serverpath": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/stlink-gdbserver/7.13.0+st.3/bin/ST-LINK_gdbserver.exe",
+      "stm32cubeprogrammer": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/programmer/2.22.0+st.1/bin",
+      "showDevDebugOutput": "none"
+    },
+    {
+      "name": "STM32 ST-Link: Debug OV_Watch (External Server)",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/Debug/OV_Watch.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "external",
+      "gdbTarget": "localhost:61234",
+      "preLaunchTask": "STM32 ST-Link: Start GDB Server",
+      "postDebugTask": "STM32 ST-Link: Stop GDB Server",
+      "armToolchainPath": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
+      "showDevDebugOutput": "none"
+    }
+  ]
+}

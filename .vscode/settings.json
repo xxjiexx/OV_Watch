@@ -1,0 +1,72 @@
+{
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 500,
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  "C_Cpp.default.configurationProvider": "",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
+  "C_Cpp.default.compilerPath": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gcc.exe",
+  "C_Cpp.default.intelliSenseMode": "gcc-arm",
+  "C_Cpp.default.cStandard": "c11",
+  "cmake.configureOnOpen": false,
+  "cmake.cmakePath": "cube-cmake",
+  "cmake.useCMakePresets": "always",
+  "cmake.configurePreset": "Debug",
+  "http.proxy": "",
+  "http.proxySupport": "off",
+  "stm32cube-ide-core.enableOfflineMode": true,
+  "stm32cube-ide-core.synchronizePdscRepositoriesOnStartup": false,
+  "stm32cube-ide-core.enableTelemetry": false,
+  "cortex-debug.armToolchainPath.windows": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
+  "cortex-debug.stlinkPath.windows": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/stlink-gdbserver/7.13.0+st.3/bin/ST-LINK_gdbserver.exe",
+  "cortex-debug.stm32cubeprogrammer.windows": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/programmer/2.22.0+st.1/bin",
+  "files.exclude": {
+    "**/Debug": true,
+    "**/Release": true,
+    "**/build": true
+  },
+  "search.exclude": {
+    "**/Debug": true,
+    "**/Release": true,
+    "**/build": true
+  },
+  "C_Cpp.files.exclude": {
+    "**/Debug": true,
+    "**/Release": true,
+    "**/build": true
+  },
+  "files.associations": {
+    "*.h": "c",
+    "*.c": "c",
+    "*.ld": "linkerscript"
+  },
+  "cmake.configureArgs": [
+    "-DCMAKE_COMMAND=cube-cmake"
+  ],
+  "cmake.preferredGenerators": [
+    "Ninja"
+  ],
+  "stm32cube-ide-clangd.path": "cube",
+  "stm32cube-ide-clangd.arguments": [
+    "starm-clangd",
+    "--query-driver=${env:CUBE_BUNDLE_PATH}/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gcc*",
+    "--query-driver=${env:CUBE_BUNDLE_PATH}/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-g++*",
+    "--compile-commands-dir=${workspaceFolder}/build/Debug"
+  ],
+  "stm32cube-ide-clangd.fallbackFlags": [
+    "-DDEBUG",
+    "-DUSE_HAL_DRIVER",
+    "-DSTM32F411xE",
+    "-IC:/Users/TwentySeven/Desktop/OV_Watch/Core/Inc",
+    "-IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/STM32F4xx_HAL_Driver/Inc",
+    "-IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy",
+    "-IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+    "-IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/CMSIS/Include",
+    "-mcpu=cortex-m4",
+    "-mfpu=fpv4-sp-d16",
+    "-mfloat-abi=hard",
+    "-std=gnu11"
+  ],
+  "stm32cube-ide-clangd.enable": true,
+  "stm32cube-ide-clangd.enableCodeCompletion": true
+}

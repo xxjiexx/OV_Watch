@@ -1,0 +1,15 @@
+CompileFlags:
+  CompilationDatabase: build/Debug
+  Add:
+    - -DDEBUG
+    - -DUSE_HAL_DRIVER
+    - -DSTM32F411xE
+    - -IC:/Users/TwentySeven/Desktop/OV_Watch/Core/Inc
+    - -IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/STM32F4xx_HAL_Driver/Inc
+    - -IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+    - -IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+    - -IC:/Users/TwentySeven/Desktop/OV_Watch/Drivers/CMSIS/Include
+    - -mcpu=cortex-m4
+    - -mfpu=fpv4-sp-d16
+    - -mfloat-abi=hard
+    - -std=gnu11

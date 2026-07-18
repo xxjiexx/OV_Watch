@@ -1,0 +1,85 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake: Build Debug",
+      "type": "shell",
+      "command": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/cmake/4.3.1+st.1/bin/cmake.exe",
+      "args": [
+        "--build",
+        "--preset",
+        "Debug"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": "$gcc",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "STM32 ST-Link: Flash Debug ELF",
+      "type": "shell",
+      "dependsOn": "CMake: Build Debug",
+      "command": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/programmer/2.22.0+st.1/bin/STM32_Programmer_CLI.exe",
+      "args": [
+        "-c",
+        "port=SWD",
+        "mode=UR",
+        "freq=1000",
+        "-w",
+        "${workspaceFolder}/build/Debug/OV_Watch.elf",
+        "-v",
+        "-rst"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32 ST-Link: Start GDB Server",
+      "type": "shell",
+      "dependsOn": "CMake: Build Debug",
+      "isBackground": true,
+      "command": "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/stlink-gdbserver/7.13.0+st.3/bin/ST-LINK_gdbserver.exe",
+      "args": [
+        "-p",
+        "61234",
+        "-l",
+        "1",
+        "-d",
+        "-s",
+        "-cp",
+        "C:/Users/TwentySeven/AppData/Local/stm32cube/bundles/programmer/2.22.0+st.1/bin"
+      ],
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting server",
+          "endsPattern": "Waiting for connection on port 61234"
+        }
+      }
+    },
+    {
+      "label": "STM32 ST-Link: Stop GDB Server",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Get-Process | Where-Object { $_.ProcessName -like 'ST-LINK_gdbserver*' } | Stop-Process -Force"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
