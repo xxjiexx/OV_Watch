@@ -1,6 +1,7 @@
 #include "app.h"
 
 #include "app_backlight.h"
+#include "app_settings.h"
 #include "app_ui.h"
 #include "key.h"
 #include "lcd.h"
@@ -55,6 +56,18 @@ void App_Init(void)
     LCD_WaitDMA();
 
     Touch_Reset();
+
+    App_Settings_Init();
+    const AppSettings *settings = App_Settings_Get();
+    App_Backlight_SetBrightness(settings->brightness);
+    if(settings->screen_timeout_ms == 0)
+    {
+        App_SetScreenTimeout(APP_SCREEN_TIMEOUT_ALWAYS);
+    }
+    else
+    {
+        App_SetScreenTimeout(settings->screen_timeout_ms);
+    }
 
     lv_init();
     lv_tick_set_cb(HAL_GetTick);

@@ -260,6 +260,8 @@ static const char datetime_day_options[] =
 
 void App_UI_Init(void)
 {
+  const AppSettings *settings = App_Settings_Get();
+  current_watch_face = settings->watch_face;
   lv_obj_add_event_cb(lv_screen_active(), Watch_Gesture_Event, LV_EVENT_GESTURE, NULL);
   Page_Watch();
 }

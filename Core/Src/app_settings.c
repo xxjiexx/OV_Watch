@@ -1,7 +1,5 @@
 #include "app_settings.h"
-#include "app_ui.h"
-#include "stm32f4xx_hal_flash.h"
-#include "stm32f4xx_hal_flash_ex.h"
+#include "main.h"
 #include <stdint.h>
 
 static const AppSettings default_settings = {
@@ -57,23 +55,26 @@ void App_Settings_Save(const AppSettings *settings)
 
     uint32_t address = APP_SETTINGS_FLASH_ADDR;
     const uint32_t *data = (const uint32_t *)&save_settings;
+
+    HAL_StatusTypeDef Erase_State = 0;
     
     save_settings.magic = APP_SETTINGS_MAGIC;
     save_settings.checksum = App_Settings_Checksum(&save_settings);
 
     HAL_FLASH_Unlock();
 
-    HAL_FLASHEx_Erase(&erase, &sector_error);
+    Erase_State = HAL_FLASHEx_Erase(&erase, &sector_error);
     
-    for(uint32_t i = 0; i < sizeof(save_settings) / 4; i++)
+    if(Erase_State == HAL_OK)
     {
-        HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, data[i]);
-        address += 4;
-    }
-
+        for(uint32_t i = 0; i < sizeof(save_settings) / 4; i++)
+        {
+            HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, data[i]);
+            address += 4;
+        }
+        current_settings = save_settings;
+    } 
     HAL_FLASH_Lock();
-
-    current_settings = save_settings;
 }
 void App_Settings_SetBrightness(uint8_t brightness)
 {
