@@ -102,6 +102,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/app.c
     Core/Src/app_backlight.c
+    Core/Src/app_time.c
     Core/Src/app_ui.c
     Core/Src/app_sensor.c
     Core/Src/app_anim_frames.c

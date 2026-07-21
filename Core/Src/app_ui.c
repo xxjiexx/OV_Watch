@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "app_backlight.h"
+#include "app_time.h"
 #include "lvgl.h"
 #include "key.h"
 
@@ -20,6 +21,9 @@
 #include "app_sensor.h"
 #include "app_anim_frames.h"
 #include "lv_port_indev.h"
+#include "rtc.h"
+#include "stm32f4xx_hal_rtc.h"
+#include "app_settings.h"
 
 /*********************
  *      DEFINES
@@ -105,8 +109,6 @@ typedef struct{
 static void Page_Watch(void);
 static void watch_timer_cb(lv_timer_t *timer);
 static int get_days_in_month(int year, int month);
-static int get_weekday(int year, int month, int day);
-static const char *get_weekday_text(int weekday);
 
 static void ContorlCenter_Create(void);
 static void Brightnessslider_Event(lv_event_t *e);
@@ -465,57 +467,36 @@ static void watch_timer_cb(lv_timer_t *timer)
   char buf[16];
   char datebuf[24];
 
-  /* 先处理秒、分、时的进位。 */
-  sec++;
-  if(sec >= 60)
-  {
-    sec = 0;
-    min++;
-  }
+  RTC_TimeTypeDef time = {0};
+  RTC_DateTypeDef date = {0};
 
-  if(min >= 60)
-  {
-    min = 0;
-    hour++;
-  }
-
-  if(hour >= 24)
-  {
-    hour = 0;
-    day++;
-  }
-
-  if(day > get_days_in_month(year, month))
-  {
-    day = 1;
-    month++;
-  }
-
-  /* 月份超过 12 时，进入下一年。 */
-  if(month > 12)
-  {
-    month = 1;
-    year++;
-  }
-
-  int day_sec = hour * 3600 + min * 60 + sec;
-  int weekday = get_weekday(year, month, day);
+  HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN); // 读取 RTC 时间，结果会写入 time 结构体。
+  HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN); // 读取 RTC 日期，读取时间后必须再读日期，RTC 影子寄存器才会更新。
 
   if(current_page != APP_PAGE_WATCH || time_label == NULL || date_label == NULL)
   {
     return;
   }
 
-  lv_snprintf(buf, sizeof(buf), "%02d:%02d:%02d", hour, min, sec);
-  lv_snprintf(datebuf, sizeof(datebuf), "%04d/%02d/%02d %s", year, month, day, get_weekday_text(weekday));
+  int day_sec = time.Hours * 3600 + time.Minutes * 60 + time.Seconds; // 把当前时间换算成一天内经过的秒数，用来刷新 24 小时进度环。
+
+  lv_snprintf(buf, sizeof(buf), "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
+  lv_snprintf(datebuf, sizeof(datebuf), "%04d/%02d/%02d %s", 2000 + date.Year, date.Month, date.Date,
+    date.WeekDay == RTC_WEEKDAY_MONDAY ? "MON" :
+    date.WeekDay == RTC_WEEKDAY_TUESDAY ? "TUE" :
+    date.WeekDay == RTC_WEEKDAY_WEDNESDAY ? "WED" :
+    date.WeekDay == RTC_WEEKDAY_THURSDAY ? "THU" :
+    date.WeekDay == RTC_WEEKDAY_FRIDAY ? "FRI" :
+    date.WeekDay == RTC_WEEKDAY_SATURDAY ? "SAT" : "SUN");
   lv_label_set_text(time_label, buf);
   lv_label_set_text(date_label, datebuf);
 
   if(day_arc != NULL)
   {
-    lv_arc_set_value(day_arc, day_sec);
+    lv_arc_set_value(day_arc, day_sec); // 圆环显示一天进度，不是只显示当前秒数。
   }
 }
+
 static int get_days_in_month(int year, int month)
 {
   switch(month)
@@ -527,49 +508,25 @@ static int get_days_in_month(int year, int month)
     case 8:
     case 10:
     case 12:
-      return 31;
+      return 31; // 大月固定 31 天。
 
     case 4:
     case 6:
     case 9:
     case 11:
-      return 30;
+      return 30; // 小月固定 30 天。
 
     case 2:
-      /* 闰年 2 月有 29 天，普通年份 2 月有 28 天。 */
       if(((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0))
       {
-        return 29;
+        return 29; // 闰年 2 月有 29 天。
       }
-      return 28;
+
+      return 28; // 平年 2 月有 28 天。
 
     default:
-      return 30;
+      return 31; // 防御性返回：月份异常时避免日期校验直接崩掉。
   }
-}
-static int get_weekday(int year, int month, int day)
-{
-  static const int month_offset[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-
-  /* 这个算法要求把 1 月和 2 月当成上一年的第 13、14 个月来计算。 */
-  if(month < 3)
-  {
-    year--;
-  }
-
-  /* 返回值：0=SUN，1=MON，2=TUE，3=WED，4=THU，5=FRI，6=SAT。 */
-  return (year + year / 4 - year / 100 + year / 400 + month_offset[month - 1] + day) % 7;
-}
-static const char *get_weekday_text(int weekday)
-{
-  static const char *weekday_text[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-
-  if(weekday < 0 || weekday > 6)
-  {
-    return "---";
-  }
-
-  return weekday_text[weekday];
 }
 
 static void ContorlCenter_Create(void)
@@ -975,6 +932,7 @@ static void WatchFace_Set(watch_face_t face)
     case WATCH_FACE_COLOR:
     case WATCH_FACE_SIMPLE:
       current_watch_face = face;
+      App_Settings_SetWatchFace(face);
       WatchFace_Refresh();
       break;
 
@@ -1347,21 +1305,25 @@ static void Backlight_Button_Event(lv_event_t *e)
   {
     case BACKLIGHT_TIMEOUT_5S:
       App_SetScreenTimeout(5000U);
+      App_Settings_SetScreenTimeout(5000);
       App_ShowToast("5 seconds");
       break;
 
     case BACKLIGHT_TIMEOUT_10S:
       App_SetScreenTimeout(10000U);
+      App_Settings_SetScreenTimeout(10000);
       App_ShowToast("10 seconds");
       break;
 
     case BACKLIGHT_TIMEOUT_30S:
       App_SetScreenTimeout(30000U);
+      App_Settings_SetScreenTimeout(30000);
       App_ShowToast("30 seconds");
       break;
 
     case BACKLIGHT_TIMEOUT_ALWAYS:
       App_SetScreenTimeout(APP_SCREEN_TIMEOUT_ALWAYS);
+      App_Settings_SetScreenTimeout(0);
       App_ShowToast("Always On");
       break;
 
@@ -1434,6 +1396,9 @@ static void Page_Datetime_Create(void)
 static void Datetime_Button_Event(lv_event_t *e)
 {
   datetime_button_t button_id = (datetime_button_t)App_ButtonGetId(e);
+  uint16_t selected_hour;
+  uint16_t selected_min;
+  uint16_t selected_sec;
   uint16_t selected_year;
   uint16_t selected_month;
   uint16_t selected_day;
@@ -1443,10 +1408,13 @@ static void Datetime_Button_Event(lv_event_t *e)
     case DATETIME_BUTTON_SAVE:
       if(datetime_mode == DATETIME_MODE_TIME)
       {
-        hour = lv_roller_get_selected(hour_rollor);
-        min = lv_roller_get_selected(min_rollor);
-        sec = lv_roller_get_selected(sec_rollor);
+        selected_hour = lv_roller_get_selected(hour_rollor);
+        selected_min = lv_roller_get_selected(min_rollor);
+        selected_sec = lv_roller_get_selected(sec_rollor);
         App_ShowToast("Time saved");
+        hour = selected_hour;
+        min = selected_min;
+        sec = selected_sec;
       }
       else
       {
@@ -1465,6 +1433,7 @@ static void Datetime_Button_Event(lv_event_t *e)
         day = selected_day;
         App_ShowToast("Date saved");
       }
+      App_Time_Set(year, month, day, hour, min, sec);
       break;
 
     case DATETIME_BUTTON_SWAP:
