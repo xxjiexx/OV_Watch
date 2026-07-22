@@ -17,9 +17,9 @@ typedef struct{
 
 void App_Settings_Init(void);
 const AppSettings *App_Settings_Get(void);
-void App_Settings_Save(const AppSettings *settings);
-void App_Settings_SetBrightness(uint8_t brightness);
-void App_Settings_SetWatchFace(uint8_t watch_face);
-void App_Settings_SetScreenTimeout(uint32_t timeout_ms);
+uint8_t App_Settings_Save(const AppSettings *settings);
+uint8_t App_Settings_SetBrightness(uint8_t brightness);
+uint8_t App_Settings_SetWatchFace(uint8_t watch_face);
+uint8_t App_Settings_SetScreenTimeout(uint32_t timeout_ms);
 
 #endif

@@ -1307,26 +1307,50 @@ static void Backlight_Button_Event(lv_event_t *e)
   {
     case BACKLIGHT_TIMEOUT_5S:
       App_SetScreenTimeout(5000U);
-      App_Settings_SetScreenTimeout(5000);
-      App_ShowToast("5 seconds");
+      if(App_Settings_SetScreenTimeout(5000) == 1)
+      {
+        App_ShowToast("5 seconds"); // 保存成功才提示用户当前背光时间。
+      }
+      else
+      {
+        App_ShowToast("Save Failed"); // Flash 写入失败时提示，避免用户以为设置已经保存。
+      }
       break;
 
     case BACKLIGHT_TIMEOUT_10S:
       App_SetScreenTimeout(10000U);
-      App_Settings_SetScreenTimeout(10000);
-      App_ShowToast("10 seconds");
+      if(App_Settings_SetScreenTimeout(10000) == 1)
+      {
+        App_ShowToast("10 seconds"); // 保存成功才提示用户当前背光时间。
+      }
+      else
+      {
+        App_ShowToast("Save Failed"); // Flash 写入失败时提示，避免用户以为设置已经保存。
+      }
       break;
 
     case BACKLIGHT_TIMEOUT_30S:
       App_SetScreenTimeout(30000U);
-      App_Settings_SetScreenTimeout(30000);
-      App_ShowToast("30 seconds");
+      if(App_Settings_SetScreenTimeout(30000) == 1)
+      {
+        App_ShowToast("30 seconds"); // 保存成功才提示用户当前背光时间。
+      }
+      else
+      {
+        App_ShowToast("Save Failed"); // Flash 写入失败时提示，避免用户以为设置已经保存。
+      }
       break;
 
     case BACKLIGHT_TIMEOUT_ALWAYS:
       App_SetScreenTimeout(APP_SCREEN_TIMEOUT_ALWAYS);
-      App_Settings_SetScreenTimeout(0);
-      App_ShowToast("Always On");
+      if(App_Settings_SetScreenTimeout(0) == 1)
+      {
+        App_ShowToast("Always On"); // Flash 里保存 0，开机恢复时再转换成永不息屏。
+      }
+      else
+      {
+        App_ShowToast("Save Failed"); // Flash 写入失败时提示，避免用户以为设置已经保存。
+      }
       break;
 
     default:
